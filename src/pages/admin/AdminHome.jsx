@@ -283,23 +283,27 @@ export default function AdminHome() {
             {/* Create Group */}
             <div className="card p-4 mb-4">
               <h2 className="h6 mb-3 fw-semibold">Create New Group</h2>
-              <form onSubmit={handleCreateGroup} className="d-flex gap-2 align-items-end">
-                <div className="flex-grow-1">
-                  <label className="form-label">Group Code</label>
-                  <input
-                    className="form-control"
-                    placeholder="E.g., IT101, P324, SE205"
-                    value={newGroupCode}
-                    onChange={e => setNewGroupCode(e.target.value)}
-                    pattern="^[a-zA-Z0-9]+$"
-                    title="Alphanumeric only"
-                    required
-                  />
+              <form onSubmit={handleCreateGroup}>
+                <div className="d-flex gap-2 align-items-end">
+                  <div className="flex-grow-1">
+                    <label className="form-label">Group Code</label>
+                    <input
+                      className="form-control"
+                      placeholder="E.g., IT101, P324, SE205"
+                      value={newGroupCode}
+                      onChange={e => setNewGroupCode(e.target.value)}
+                      pattern="^[a-zA-Z0-9]+$"
+                      title="Alphanumeric only"
+                      required
+                    />
+                  </div>
+                  <button className="btn btn-primary" disabled={groupBusy}>
+                    {groupBusy ? "…" : "+ Create"}
+                  </button>
+                </div>
+                <div className="mt-1">
                   <small className="text-soft">Alphanumeric only (e.g., IT101, P324)</small>
                 </div>
-                <button className="btn btn-primary" disabled={groupBusy} style={{ height: "38px" }}>
-                  {groupBusy ? "…" : "+ Create"}
-                </button>
               </form>
             </div>
 

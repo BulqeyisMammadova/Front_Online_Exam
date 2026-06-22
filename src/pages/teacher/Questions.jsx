@@ -139,96 +139,94 @@ export default function Questions() {
         <>
           <div className="modal d-block" tabIndex="-1">
             <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-              <div className="modal-content">
-                <form onSubmit={save}>
-                  <div className="modal-header">
-                    <h5 className="modal-title h6 mb-0">{f.id ? "Edit Question" : "New Question"}</h5>
-                    <button type="button" className="btn-close" onClick={() => setOpen(false)}></button>
+              <form onSubmit={save} className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title h6 mb-0">{f.id ? "Edit Question" : "New Question"}</h5>
+                  <button type="button" className="btn-close" onClick={() => setOpen(false)}></button>
+                </div>
+                <div className="modal-body">
+                  {err && <div className="alert alert-danger py-2 small">{err}</div>}
+
+                  <div className="mb-3">
+                    <label className="form-label">Question Text</label>
+                    <textarea className="form-control" rows={2} value={f.text}
+                      onChange={(e) => setF({ ...f, text: e.target.value })} required />
                   </div>
-                  <div className="modal-body">
-                    {err && <div className="alert alert-danger py-2 small">{err}</div>}
 
+                  <div className="row g-2 mb-3">
+                    <div className="col-md-4">
+                      <label className="form-label">Type</label>
+                      <select className="form-select" value={f.type} onChange={(e) => pickType(e.target.value)}>
+                        <option value={1}>Multiple Choice</option>
+                        <option value={2}>True/False</option>
+                        <option value={3}>Short Answer</option>
+                      </select>
+                    </div>
+                    <div className="col-md-4">
+                      <label className="form-label">Difficulty</label>
+                      <select className="form-select" value={f.difficulty}
+                        onChange={(e) => setF({ ...f, difficulty: e.target.value })}>
+                        <option value={1}>Easy</option>
+                        <option value={2}>Medium</option>
+                        <option value={3}>Hard</option>
+                      </select>
+                    </div>
+                    <div className="col-md-4">
+                      <label className="form-label">Points</label>
+                      <input type="number" min={1} max={100} className="form-control" value={f.points}
+                        onChange={(e) => setF({ ...f, points: e.target.value })} />
+                    </div>
+                  </div>
+
+                  {f.type === 3 ? (
                     <div className="mb-3">
-                      <label className="form-label">Question Text</label>
-                      <textarea className="form-control" rows={2} value={f.text}
-                        onChange={(e) => setF({ ...f, text: e.target.value })} required />
+                      <label className="form-label">Correct Answer</label>
+                      <input className="form-control" value={f.correctAnswerText}
+                        onChange={(e) => setF({ ...f, correctAnswerText: e.target.value })}
+                        placeholder="Expected answer text" />
+                      <small className="text-soft">Case-insensitive</small>
                     </div>
-
-                    <div className="row g-2 mb-3">
-                      <div className="col-md-4">
-                        <label className="form-label">Type</label>
-                        <select className="form-select" value={f.type} onChange={(e) => pickType(e.target.value)}>
-                          <option value={1}>Multiple Choice</option>
-                          <option value={2}>True/False</option>
-                          <option value={3}>Short Answer</option>
-                        </select>
+                  ) : (
+                    <div className="mb-3">
+                      <div className="d-flex justify-content-between align-items-center mb-1">
+                        <label className="form-label mb-0">Options</label>
+                        {f.type === 1 && (
+                          <button type="button" className="btn btn-light btn-sm py-0"
+                            onClick={() => setF({ ...f, options: [...f.options, { text: "", isCorrect: false }] })}>
+                            + Option
+                          </button>
+                        )}
                       </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Difficulty</label>
-                        <select className="form-select" value={f.difficulty}
-                          onChange={(e) => setF({ ...f, difficulty: e.target.value })}>
-                          <option value={1}>Easy</option>
-                          <option value={2}>Medium</option>
-                          <option value={3}>Hard</option>
-                        </select>
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Points</label>
-                        <input type="number" min={1} max={100} className="form-control" value={f.points}
-                          onChange={(e) => setF({ ...f, points: e.target.value })} />
-                      </div>
-                    </div>
-
-                    {f.type === 3 ? (
-                      <div className="mb-3">
-                        <label className="form-label">Correct Answer</label>
-                        <input className="form-control" value={f.correctAnswerText}
-                          onChange={(e) => setF({ ...f, correctAnswerText: e.target.value })}
-                          placeholder="Expected answer text" />
-                        <small className="text-soft">Case-insensitive</small>
-                      </div>
-                    ) : (
-                      <div className="mb-3">
-                        <div className="d-flex justify-content-between align-items-center mb-1">
-                          <label className="form-label mb-0">Options</label>
-                          {f.type === 1 && (
-                            <button type="button" className="btn btn-light btn-sm py-0"
-                              onClick={() => setF({ ...f, options: [...f.options, { text: "", isCorrect: false }] })}>
-                              + Option
-                            </button>
+                      {f.options.map((o, i) => (
+                        <div className="input-group mb-2" key={i}>
+                          <span className="input-group-text">
+                            <input type={f.type === 2 ? "radio" : "checkbox"} name="correct"
+                              checked={o.isCorrect} onChange={(e) => setOpt(i, "isCorrect", e.target.checked)} />
+                          </span>
+                          <input className="form-control" value={o.text} disabled={f.type === 2}
+                            onChange={(e) => setOpt(i, "text", e.target.value)} placeholder={`Option ${i + 1}`} />
+                          {f.type === 1 && f.options.length > 2 && (
+                            <button type="button" className="btn btn-light"
+                              onClick={() => setF({ ...f, options: f.options.filter((_, x) => x !== i) })}>×</button>
                           )}
                         </div>
-                        {f.options.map((o, i) => (
-                          <div className="input-group mb-2" key={i}>
-                            <span className="input-group-text">
-                              <input type={f.type === 2 ? "radio" : "checkbox"} name="correct"
-                                checked={o.isCorrect} onChange={(e) => setOpt(i, "isCorrect", e.target.checked)} />
-                            </span>
-                            <input className="form-control" value={o.text} disabled={f.type === 2}
-                              onChange={(e) => setOpt(i, "text", e.target.value)} placeholder={`Option ${i + 1}`} />
-                            {f.type === 1 && f.options.length > 2 && (
-                              <button type="button" className="btn btn-light"
-                                onClick={() => setF({ ...f, options: f.options.filter((_, x) => x !== i) })}>×</button>
-                            )}
-                          </div>
-                        ))}
-                        <small className="text-soft">Check correct option(s) using the box on the left</small>
-                      </div>
-                    )}
-
-                    <div>
-                      <label className="form-label">Explanation <span className="text-soft">(optional)</span></label>
-                      <textarea className="form-control" rows={2} value={f.explanation}
-                        onChange={(e) => setF({ ...f, explanation: e.target.value })}
-                        placeholder="Will be displayed on result page" />
+                      ))}
+                      <small className="text-soft">Check correct option(s) using the box on the left</small>
                     </div>
+                  )}
+
+                  <div>
+                    <label className="form-label">Explanation <span className="text-soft">(optional)</span></label>
+                    <textarea className="form-control" rows={2} value={f.explanation}
+                      onChange={(e) => setF({ ...f, explanation: e.target.value })}
+                      placeholder="Will be displayed on result page" />
                   </div>
-                  <div className="modal-footer">
-                    <button type="button" className="btn btn-light" onClick={() => setOpen(false)}>Cancel</button>
-                    <button className="btn btn-primary" disabled={busy}>{busy ? "Saving…" : "Save"}</button>
-                  </div>
-                </form>
-              </div>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-light" onClick={() => setOpen(false)}>Cancel</button>
+                  <button className="btn btn-primary" disabled={busy}>{busy ? "Saving…" : "Save"}</button>
+                </div>
+              </form>
             </div>
           </div>
           <div className="modal-backdrop show"></div>
